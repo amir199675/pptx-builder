@@ -76,6 +76,32 @@ class ChartSlideBuilder:
         data_labels.show_category_name = True
         # data_labels.show_percentage = True
 
+    def add_table_to_slide(self, title, categories, values1, values2, values3):
+        # اضافه کردن جدول
+        new_slide = self.presentation.slides.add_slide(self.bg_slide.slide_layout)
+
+        rows = len(categories) + 1  # برای عنوان‌ها یک ردیف اضافی
+        cols = 4  # برای چهار ستون
+
+        table = new_slide.shapes.add_table(rows, cols, Inches(1), Inches(1), Inches(8), Inches(3)).table
+
+        # تنظیم عرض ستون‌ها
+        for col in range(cols):
+            table.columns[col].width = Inches(2)
+
+        # اضافه کردن عنوان‌ها
+        table.cell(0, 0).text = "پاسخ"
+        table.cell(0, 1).text = "تعداد"
+        table.cell(0, 2).text = "مرد"
+        table.cell(0, 3).text = "زن"
+
+        # اضافه کردن داده‌ها به جدول
+        for row in range(1, rows):
+            table.cell(row, 0).text = categories[row - 1]
+            table.cell(row, 1).text = str(values1[row - 1])
+            table.cell(row, 2).text = str(values2[row - 1])
+            table.cell(row, 3).text = str(values3[row - 1])
+
     def add_intro_slide(self, text):
         # layout = self.presentation.slide_layouts[layout_index]  # مثلاً Title layout
         slide = self.presentation.slides.add_slide(self.bg_intro_slide.slide_layout)
@@ -119,16 +145,22 @@ class ChartSlideBuilder:
             chart_categories = []
             pie_chart_values = []
             column_chart_values = []
+            values2 = []
+            values3 = []
+            column_chart_values = []
             for option in i['options']:
                 chart_categories.append(option['value_title'])
                 pie_chart_values.append(option['percentage'])
                 column_chart_values.append(option['count'])
+                values2.append(option['men_count'])
+                values3.append(option['women_count'])
             self.add_pie_chart_slide(
                 title=i['question_title'],
                 categories=chart_categories,
                 values=pie_chart_values,
                 series_name=i['question_title']
             )
+            self.add_table_to_slide(i['question_title'], chart_categories, column_chart_values,values2, values3)
             self.add_column_chart_slide(
                 title=i['question_title'],
                 categories=chart_categories,
