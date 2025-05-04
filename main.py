@@ -37,6 +37,7 @@ class PptxElementDetector:
     def __init__(self, template_path):
         self.template_path = template_path
         self.prs = Presentation(template_path)
+        self.new_prs = Presentation()
 
     def get_first_slide(self):
         return self.prs.slides[0]
@@ -51,6 +52,28 @@ class PptxElementDetector:
         for shape in slide.shapes:
             if hasattr(shape, 'text'):
                 self.set_text(shape,title)
+
+    def first_slide_layout(self):
+        return self.prs.slides[0].slide_layout
+    
+    def question_slide_layout(self):
+        return self.prs.slides[1].slide_layout
+
+    def add_first_slide(self,title):
+        slide = self.new_prs.slides.add_slide(self.first_slide_layout())
+        for shape in slide.shapes:
+            if hasattr(shape, 'text'):
+                self.set_text(shape,title)
+        output_path = 'output.pptx'
+        self.prs.save(output_path)
+    
+    def add_question_slide(self,question):
+        slide = self.new_prs.slides.add_slide(self.question_slide_layout())
+        for shape in slide.shapes:
+            if hasattr(shape, 'text'):
+                self.set_text(shape,question)
+        output_path = 'output.pptx'
+        self.prs.save(output_path)
 
     def set_header_question_slide(self,slide ,header):
         for shape in slide.shapes:
@@ -75,18 +98,20 @@ class PptxElementDetector:
                     run.font.bold = font_bold
                     run.font.italic = font_italic
 
-        output_path = 'output.pptx'
-        self.prs.save(output_path)
+        # output_path = 'output.pptx'
+        # self.prs.save(output_path)
 
 
     def create_slides(self):
+        
         self.set_first_slide_data(self.get_first_slide(),self.template_text['first_page'].replace('{}',questionnaire['title']))
         for question in questionnaire['questions']:
             slide = self.get_questions_slide()
             slide_layout = slide.slide_layout
             new_slide = self.prs.slides.add_slide(slide_layout)
             self.set_header_question_slide(new_slide,question['text'])
-
+        output_path = 'output.pptx'
+        self.prs.save(output_path)
 
 
 
@@ -110,4 +135,5 @@ class PptxElementDetector:
     #                         for point in series.points:
     #                             print(f"برچسب: {point.label}, مقدار: {point.value}")
 
-result = PptxElementDetector('template.pptx').create_slides()
+# result = PptxElementDetector('template.pptx').create_slides()
+result = PptxElementDetector('template.pptx').add_first_slide('fdsafljalsd')
